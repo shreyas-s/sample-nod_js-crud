@@ -1,0 +1,25 @@
+{
+  "name": "sample-crud",
+  "version": "1.0.0",
+  "description": "This contains basic CRUD operation with authentication using Node and MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shreyas-s/sample-nod_js-crud.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shreyas-s/sample-nod_js-crud/issues"
+  },
+  "homepage": "https://github.com/shreyas-s/sample-nod_js-crud#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "lodash": "^4.17.11",
+    "mongoose": "^5.3.1"
+  }
+}
