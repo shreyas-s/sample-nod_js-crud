@@ -68,6 +68,35 @@ app.put('/user/:id',(req,resp)=>{
 
 });
 
+app.delete('/user/:id',(req,resp)=>{
+ var id = req.params.id;
+ User.findByIdAndRemove(id).then((user)=>{
+    if(!(user)){
+        resp.status(400).send();
+    }
+    resp.status(200).send(user);
+
+ })
+ .catch((err)=>{
+     resp.status(400).send(err);
+ });
+});
+
+ app.delete('/users',(req,resp)=>{
+    User.remove({}).then((result)=>{
+       if(!(result)){
+           resp.status(400).send();
+       }
+       resp.status(200).send(result);
+   
+    })
+    .catch((err)=>{
+        resp.status(400).send(err);
+    });
+   
+ 
+});
+
 app.listen(3000,()=>{
 console.log("starting to listen @ 3000");
 });
