@@ -45,10 +45,15 @@ var usr = new User({
     password: pwd,
     name: name
 });
+/*
 usr.save().then((doc)=>{
 resp.status(200).send(doc);
 
 },(e)=>{resp.status(400).send(e)});
+*/
+usr.save().then(()=>{
+    return usr.generateTokenForAuthentication();
+}).then((token)=>{ resp.header('x-auth',token).send(usr)}).catch((e) => {resp.status(400).send(e); })
 });
 
 app.put('/user/:id',(req,resp)=>{
