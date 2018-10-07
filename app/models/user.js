@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
 
 var UserSchema = new mongoose.Schema({
     email: {
@@ -39,6 +40,16 @@ var UserSchema = new mongoose.Schema({
     }]
 });
 
+UserSchema.methods.generateTokenForAuthentication = function(){
+    var usr = this;
+    var access = 'auth';
+   
+    var token = jwt.sign({_id: usr._id.toHexString(),access},'SHRSALTING').toString();
+    usr.tokens = usr.tokens.concat([{access,token}]);
+    return usr.save().then(()=>{ return token;});
+   }
+   
 var User = mongoose.model('User',UserSchema);
+
 
 module.exports= {User};
