@@ -3,6 +3,7 @@ const express = require('express');
 var {User} = require('./app/models/user');
 const bodyParser = require('body-parser');
 var _ = require('lodash');
+var {importer} = require('./app/helper/csvtojson_helper');
 
 var app = express();
 app.use(bodyParser.json());
@@ -95,6 +96,26 @@ app.delete('/user/:id',(req,resp)=>{
     });
    
  
+});
+
+app.post('/upload-users',(req,resp)=>{
+    var importFilePath = req.body.import_file_path;
+    var importFileType = req.body.import_file_type;
+  if(importFileType == 'csv'){
+      importer.importFile(importFilePath).then((res)=>{
+         // console.log(res);
+         res.forEach(userElement => {
+            var usr = new User(userElement);
+            usr.save();
+         });
+          resp.status(200).send("succesfully imported users from filepath"+importFilePath);
+      }).catch((e)=>{
+        resp.status(400).send(e);
+      });
+  }
+  else{
+      resp.status(400).send("formats other than csv are not supported for import");
+  }
 });
 
 app.listen(3000,()=>{
