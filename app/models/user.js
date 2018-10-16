@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
 var UserSchema = new mongoose.Schema({
     email: {
@@ -39,6 +40,32 @@ var UserSchema = new mongoose.Schema({
         }
     }]
 });
+
+UserSchema.methods.toJSON = function () {
+    var user = this;
+    var userObject = user.toObject();
+  
+    return _.pick(userObject, ['_id', 'email']);
+  };
+  
+
+UserSchema.statics.findByAuthTokenId = function(tokenId){
+    var User = this;
+    var tokenInfo;
+
+    try{
+        tokenInfo = jwt.verify(tokenId,'SHRSALTING');
+
+    }
+    catch(e){
+        return Promise.reject('could not match token Id with User info.');
+    }
+    return User.findOne({
+        '_id': tokenInfo._id,
+        'tokens.token': tokenId,
+        'tokens.access': 'auth'
+    });
+};
 
 UserSchema.methods.generateTokenForAuthentication = function(){
     var usr = this;
