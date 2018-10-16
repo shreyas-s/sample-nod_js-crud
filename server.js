@@ -56,6 +56,22 @@ usr.save().then(()=>{
 }).then((token)=>{ resp.header('x-auth',token).send(usr)}).catch((e) => {resp.status(400).send(e); })
 });
 
+app.get('/usr/dashboard',(req,resp)=>{
+    var token = req.header('x-auth');
+    if(token){
+    User.findByAuthTokenId(token).then((usr)=>{
+        if(!(usr)){
+            resp.status(401).send("No Proper token provided");
+        }
+        console.log("successfully fetched User info for token");
+        resp.send(usr);
+    });
+}
+else{
+    resp.status(401).send("This resource can be accessed only with proper token headers");
+}
+});
+
 app.put('/user/:id',(req,resp)=>{
  console.log("inside update users Block");
  // here we try to restrict to update only email & name , not pwd using pick function.
