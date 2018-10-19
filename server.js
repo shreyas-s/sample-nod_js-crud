@@ -2,8 +2,10 @@ var {mongoose} = require('./app/db/mongoose_config');
 const express = require('express');
 var {User} = require('./app/models/user');
 const bodyParser = require('body-parser');
-var _ = require('lodash');
+const _ = require('lodash');
 var {importer} = require('./app/helper/csvtojson_helper');
+const bcrypt = require('bcryptjs');
+const chalk = require('chalk');
 
 var app = express();
 app.use(bodyParser.json());
@@ -20,6 +22,35 @@ app.get("/users",(req,resp)=>{
 );
 
 });
+
+app.post("/user/login",(req,resp)=>{
+    var email = req.body.email;
+    var pwd = req.body.password;
+    console.log(chalk.blue("Inside Login Module"));
+    User.findOne({'email': email}).then((user)=>{
+        if(!(user)){
+            console.log(chalk.red("no user exists with this email"));
+            resp.status(400).send("no user exists with this email");
+        }
+        else{
+        bcrypt.compare(pwd,user.password,function(err,matchFlg){
+            if(err){
+                console.log(chalk.red("Error occured during matching",err));
+                resp.status(500).send("Err occured"); 
+            }
+            if(matchFlg == true){
+                console.log(chalk.green("pasword matched success"));
+                resp.header('x-auth',user.tokens[0].token).send(user);
+            }
+            else{
+                console.log(chalk.red("password does not matches"));
+                resp.status(401).send("Password doesnot match for given user");
+            }
+        });
+    }
+    });  
+});
+
 
 app.get("/user/:id",(req,resp)=>{
 var id = req.params.id;
