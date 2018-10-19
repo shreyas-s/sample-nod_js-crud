@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
+const BCRYPT_NO_OF_ROUNDS_TO_HASH = 10;
 
 var UserSchema = new mongoose.Schema({
     email: {
@@ -18,12 +20,12 @@ var UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         minlength: 6,
-        validate: {
+        /*validate: {
             validator: function(val){
                 return validator.isAlphanumeric(val,'en-US');
             },
             message: 'Password {VALUE} must be of Alpha Numeric format'
-        }
+        }*/
     },
     name: {
         type: String,
@@ -66,6 +68,25 @@ UserSchema.statics.findByAuthTokenId = function(tokenId){
         'tokens.access': 'auth'
     });
 };
+
+UserSchema.pre('save',function(next){
+    //ref - https://mongoosejs.com/docs/api.html#schema_Schema-pre
+    console.log("calling when saving user model");
+  var user = this;
+  if(user.isModified('password')){
+      console.log("if pwd field is modified or added");
+      //ref - http://codetheory.in/using-the-node-js-bcrypt-module-to-hash-and-safely-store-passwords/
+    bcrypt.genSalt(BCRYPT_NO_OF_ROUNDS_TO_HASH,(err,salt)=>{
+        bcrypt.hash(user.password,salt,(err,hashedPwd)=>{
+            user.password = hashedPwd;
+            next();
+        });
+    });
+  }
+  else{
+      next();
+  }
+});
 
 UserSchema.methods.generateTokenForAuthentication = function(){
     var usr = this;

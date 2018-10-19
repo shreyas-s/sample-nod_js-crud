@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/shreyas-s/sample-nod_js-crud#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
+    "chalk": "^2.4.1",
     "csvtojson": "^2.0.8",
     "express": "^4.16.3",
     "jsonwebtoken": "^8.3.0",
