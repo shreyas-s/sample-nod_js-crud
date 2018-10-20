@@ -40,7 +40,11 @@ app.post("/user/login",(req,resp)=>{
             }
             if(matchFlg == true){
                 console.log(chalk.green("pasword matched success"));
-                resp.header('x-auth',user.tokens[0].token).send(user);
+               // resp.header('x-auth',user.tokens[0].token).send(user);
+               user.generateTokenForAuthentication().then((token) => 
+            {
+                resp.header('x-auth',token).send(user);
+            });
             }
             else{
                 console.log(chalk.red("password does not matches"));
@@ -96,6 +100,9 @@ app.get('/usr/dashboard',(req,resp)=>{
         }
         console.log("successfully fetched User info for token");
         resp.send(usr);
+    }).catch((e) => {
+        console.log("error occured in finding by token",e);
+        resp.status(401).send("No Proper Token Provided for X-auth");
     });
 }
 else{
